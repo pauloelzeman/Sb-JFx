@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SbJFxApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SbJFxApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SbJFxApplication.class, args);
+    }
 
 }
