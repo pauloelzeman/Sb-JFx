@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page with Shattered Matrix Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .login-container {
+            position: absolute;
+            z-index: 2;
+            background-color: #000;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.clear {
+            background-color: #f44336;
+        }
+
+        button.clear:hover {
+            background-color: #d32f2f;
+        }
+
+        .matrix {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .code {
+            display: inline-block;
+            opacity: 0;
+            animation: animateCode 5s linear infinite;
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: hsl(120, 100%, 50%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .explode {
+            display: none;
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: hsl(120, 100%, 50%);
+            animation: explode 0.5s linear;
+        }
+
+        @keyframes animateCode {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes explode {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(calc(var(--explode-x) * 1px)) translateY(calc(var(--explode-y) * 1px));
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="matrix">
+    <!-- Add more lines of code dynamically with JavaScript -->
+</div>
+
+<div class="login-container">
+    <h2>Login</h2>
+    <form action="#" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <button type="submit">Acessar</button>
+        <button type="reset" class="clear">Limpar</button>
+    </form>
+</div>
+
+<script>
+    const matrixContainer = document.querySelector(".matrix");
+    let cursorMoving = false;
+
+    function createRandomCode() {
+        const codeElement = document.createElement("span");
+        codeElement.classList.add("code");
+        codeElement.textContent = getRandomCharacter();
+        matrixContainer.appendChild(codeElement);
+
+        const xPos = Math.random() * window.innerWidth;
+        const yPos = Math.random() * window.innerHeight;
+        const speed = Math.random() * 2 + 1;
+
+        codeElement.style.left = `${xPos}px`;
+        codeElement.style.top = `${yPos}px`;
+        codeElement.style.animationDuration = `${speed}s`;
+
+        codeElement.addEventListener("animationiteration", () => {
+            codeElement.textContent = getRandomCharacter();
+        });
+
+        codeElement.addEventListener("click", () => {
+            explodeLetter(codeElement);
+        });
+    }
+
+    function getRandomCharacter() {
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        return characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    function moveLetters(event) {
+        const letters = document.querySelectorAll('.code');
+        letters.forEach(letter => {
+            const speed = parseFloat(letter.style.animationDuration) || 1;
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const letterX = parseFloat(letter.style.left);
+            const letterY = parseFloat(letter.style.top);
+            const dx = mouseX - letterX;
+            const dy = mouseY - letterY;
+            const angle = Math.atan2(dy, dx);
+            const distance = speed * 50;
+            const newX = letterX + distance * Math.cos(angle);
+            const newY = letterY + distance * Math.sin(angle);
+            letter.style.left = `${newX}px`;
+            letter.style.top = `${newY}px`;
+
+            if (cursorMoving) {
+                letter.style.transition = "transform 0.3s ease-out";
+                letter.style.transform = "scale(1)";
+            } else {
+                letter.style.transition = "transform 0.5s ease-in";
+                letter.style.transform = "scale(0.8)";
+            }
+        });
+    }
+
+    function explodeLetter(letter) {
+        const explodeElement = document.createElement("div");
+        explodeElement.classList.add("explode");
+        document.body.appendChild(explodeElement);
+
+        const letterRect = letter.getBoundingClientRect();
+        const explodeRect = explodeElement.getBoundingClientRect();
+
+        const explodeX = letterRect.left - explodeRect.left + letterRect.width / 2;
+        const explodeY = letterRect.top - explodeRect.top + letterRect.height / 2;
+
+        explodeElement.style.setProperty("--explode-x", explodeX);
+        explodeElement.style.setProperty("--explode-y", explodeY);
+
+        explodeElement.addEventListener("animationend", () => {
+            explodeElement.remove();
+        });
+
+        explodeElement.style.left = `${explodeX}px`;
+        explodeElement.style.top = `${explodeY}px`;
+        explodeElement.style.display = "block";
+    }
+
+    document.addEventListener('mousemove', (event) => {
+        cursorMoving = true;
+        moveLetters(event);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === "Escape") {
+            explodeLetters();
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        cursorMoving = false;
+    });
+
+    setInterval(createRandomCode, 100); // Adjust the interval as needed
+
+    // Start with cursorMoving as false to initiate the scale transition
+    cursorMoving = false;
+</script>
+
+</body>
+</html>
