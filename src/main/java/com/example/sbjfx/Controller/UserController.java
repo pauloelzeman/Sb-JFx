@@ -8,6 +8,6 @@ public class UserController {
     @GetMapping("/login")
     public String GetUser()
     {
-        return "GetUser";
+        return "Teste de retorno GetUser";
     }
 }
